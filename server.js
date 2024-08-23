@@ -11,7 +11,6 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 9000;
 
-
 const server = app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
@@ -19,15 +18,16 @@ const server = app.listen(PORT, () => {
 // Serve static files from the 'public' directory
 app.use(express.static(__dirname + "/public"));
 
+// Serve the index.html file from the 'public' directory
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+  res.sendFile(__dirname + "/public/index.html"); // Corrected file path
 });
 
-//socket
+// Socket.io setup
 const io = new Server(server);
 const users = {};
 
-// If any new user joins,let other user connected to the server know!
+// If any new user joins, let other users connected to the server know
 io.on("connection", (socket) => {
   socket.on("new-user-joined", (Name) => {
     console.log("New user", Name);
@@ -35,7 +35,7 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("user-joined", Name);
   });
 
-// If someone sends a message broadcast it to other people
+  // If someone sends a message, broadcast it to other people
   socket.on("send", (message) => {
     socket.broadcast.emit("receive", {
       message: message,
@@ -43,8 +43,8 @@ io.on("connection", (socket) => {
     });
   });
 
-// If someone leave the chat, let other know
-  socket.on("disconnect", (message) => {
+  // If someone leaves the chat, let others know
+  socket.on("disconnect", () => {
     socket.broadcast.emit("left", users[socket.id]);
     delete users[socket.id];
   });
