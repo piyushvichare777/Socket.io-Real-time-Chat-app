@@ -30,7 +30,6 @@ const users = {};
 // If any new user joins, let other users connected to the server know
 io.on("connection", (socket) => {
   socket.on("new-user-joined", (Name) => {
-    console.log("New user", Name);
     users[socket.id] = Name;
     socket.broadcast.emit("user-joined", Name);
   });
